@@ -23,6 +23,9 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
 
+linter:
+  rules:
+    - non_constant_identifier_names
 
 flutter:
 
