@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:g21097717/api.dart';
+import 'package:g21097717/DetailScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TvTonight extends StatefulWidget {
   const TvTonight({Key? key});
@@ -20,11 +22,11 @@ class _TvTonightState extends State<TvTonight> {
       var tonightJson = tempData['Results'];
       for (var i = 0; i < tonightJson.length; i++) {
         tvTonightList.add({
-          "name": tonightJson[i]["name"],
-          "poster_path": tonightJson[i]["poster_path"],
-          "vote_average": tonightJson[i]["vote_average"],
-          "date": tonightJson[i]["date"],
-          "id": tonightJson[i]["id"],
+          'name': tonightJson[i]['name'],
+          'poster_path': tonightJson[i]['poster_path'],
+          'vote_average': tonightJson[i]['vote_average'],
+          'date': tonightJson[i]['date'],
+          'id': tonightJson[i]['id'],
         });
       }
     } else {
@@ -57,13 +59,16 @@ class _TvTonightState extends State<TvTonight> {
                   itemCount: tvTonightList.length,
                   itemBuilder: (context, index){
                     return GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        print(tvTonightList[index]['name']);
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DetailScreen(), ));
+                      },
                       child: Container(
                         decoration: BoxDecoration( 
                           borderRadius: BorderRadius.circular(15),
                           image: DecorationImage(
                             image: NetworkImage(
-                              'https://image.tmdb.org/t/p/w500${tvTonightList[index]['poster_path']}'),
+                              'https://image.tmdb.org/t/p/original/${tvTonightList[index]['poster_path']}'),
                             fit: BoxFit.cover
                           ),
                         ),
