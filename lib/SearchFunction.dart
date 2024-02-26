@@ -38,7 +38,7 @@ class _SearchFunctionState extends State<SearchFunction> {
             'id': obj['id'],
             'poster_path': obj['poster_path'],
             'vote_average': obj['vote_average'],
-            'media_type': obj['media_type'], // Corrected field name
+            'media_type': obj['media_type'], 
             'popularity': obj['popularity'],
             'overview': obj['overview']
           });
@@ -47,7 +47,7 @@ class _SearchFunctionState extends State<SearchFunction> {
             searchResult.removeRange(20, searchResult.length);
           }
         } else {
-          print('Result not found');
+          print('Result found');
         }
       }
     } else {
@@ -144,7 +144,7 @@ class _SearchFunctionState extends State<SearchFunction> {
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onTap: () {
-                                                                Navigator.push(
+                                  Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => descriptioncheckui(
@@ -169,6 +169,7 @@ class _SearchFunctionState extends State<SearchFunction> {
                                         image: DecorationImage(
                                           image: NetworkImage(
                                             'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}',
+
                                           ),
                                           fit: BoxFit.fill,
                                         ),

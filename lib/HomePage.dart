@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:g21097717/Movie.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:g21097717/api.dart';
 import 'package:g21097717/SearchFunction.dart';
-import 'package:g21097717/TvTonight.dart';
-import 'package:g21097717/HighestGrossing.dart';
+import 'package:g21097717/tvseries.dart';
 import 'package:g21097717/Children.dart';
 
 class HomePage extends StatefulWidget {
@@ -129,7 +129,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     tabs: [
                       Tab(child: Text('Tv Series')),
                       Tab(child: Text('Movies')),
-                      Tab(child: Text('Children Movies'))
+                      Tab(child: Text('To Watch'))
                     ]),
               ),
               Container(
@@ -137,8 +137,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    TvTonight(), //change
-                    HighestGrossing(), //change
+                    TvSeries(), 
+                    Movie(), //change
                     Children(),
                   ],
                 ),
