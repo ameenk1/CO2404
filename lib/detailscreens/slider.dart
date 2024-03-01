@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
-// Define your MovieDetails and TvSeriesDetails widgets or import them if they are defined elsewhere
-
-// Define your tittletext, datetext, and ratingtext functions or replace them with appropriate widgets
+import 'package:g21097717/detailscreens/TvSeriesDetails.dart';
+import 'package:g21097717/detailscreens/MovieDetails.dart';
 
 class YourWidget extends StatelessWidget {
   @override
@@ -29,10 +27,21 @@ Widget sliderlist(List firstlistname, String categorytittle, String type, int it
             return GestureDetector(
               onTap: () {
                 if (type == 'movie') {
-                  // Handle movie tap
-                } else if (type == 'tv') {
-                  // Handle TV series tap
-                }
+                      // print(firstlistname[index]['id']);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MovieDetails(
+                                    id: firstlistname[index]['id'],
+                                  )));
+                    } else if (type == 'tv') {
+                      // print(firstlistname[index]['id']);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TvSeriesDetails(
+                                  id: firstlistname[index]['id'])));
+                    }
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -50,36 +59,46 @@ Widget sliderlist(List firstlistname, String categorytittle, String type, int it
                 ),
                 margin: EdgeInsets.only(left: 13),
                 width: 170,
-                child: Row(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 2, left: 6),
-                      child: Text(firstlistname[index]['Date'].toString()), // Placeholder for datetext
+                      child: Text(firstlistname[index]['name'], style: TextStyle(color: Colors.white)), // Name of the movie or TV series
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2, right: 6),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(5),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2, left: 6),
+                          child: Text(firstlistname[index]['Date'].toString()), // Placeholder for datetext
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.star,
-                                color: Colors.yellow,
-                                size: 15,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2, right: 6),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.yellow,
+                                    size: 15,
+                                  ),
+                                  SizedBox(width: 2),
+                                  Text(firstlistname[index]['vote_average'].toString()), // Placeholder for ratingtext
+                                ],
                               ),
-                              SizedBox(width: 2),
-                              Text(firstlistname[index]['vote_average'].toString()), // Placeholder for ratingtext
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),

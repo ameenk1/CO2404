@@ -6,50 +6,37 @@ import 'package:g21097717/DetailScreen.dart';
 import 'package:g21097717/detailscreens/slider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class Movie extends StatefulWidget {
-  const Movie({super.key});
+  const Movie({Key? key});
 
   @override
   State<Movie> createState() => _MovieState();
 }
 
 class _MovieState extends State<Movie> {
-  List<Map<String, dynamic>> popularmovies = [];
+  List<Map<String, dynamic>> Childrenmovies = [];
   List<Map<String, dynamic>> nowplayingmovies = [];
-
-  List<Map<String, dynamic>> topratedmovies = [];
-  List<Map<String, dynamic>> latestmovies = [];
+  List<Map<String, dynamic>> grossmovies = [];
 
   Future<void> moviesfunction() async {
-    var popularmoviesurl =
-        'https://api.themoviedb.org/3/movie/popular?api_key=$apikey';
-    var nowplayingmoviesurl =
-        'https://api.themoviedb.org/3/movie/now_playing?api_key=$apikey';
-    var topratedmoviesurl =
-        'https://api.themoviedb.org/3/movie/top_rated?api_key=$apikey';
-    var latestmoviesurl =
-        'https://api.themoviedb.org/3/movie/latest?api_key=$apikey';
-    /////////////////////////////////
-    var popularmoviesresponse = await http.get(Uri.parse(childrenurl));
-    if (popularmoviesresponse.statusCode == 200) {
-      var tempdata = jsonDecode(popularmoviesresponse.body);
+    var Childrenmoviesresponse = await http.get(Uri.parse(childrenurl));
+    if (Childrenmoviesresponse.statusCode == 200) {
+      var tempdata = jsonDecode(Childrenmoviesresponse.body);
       var popularmoviesjson = tempdata['results'];
       for (var i = 0; i < popularmoviesjson.length; i++) {
-        popularmovies.add({
-          "name": popularmoviesjson[i]["title"],
-          "poster_path": popularmoviesjson[i]["poster_path"],
-          "vote_average": popularmoviesjson[i]["vote_average"],
-          "Date": popularmoviesjson[i]["release_date"],
-          "id": popularmoviesjson[i]["id"],
+        Childrenmovies.add({
+          'name': popularmoviesjson[i]['title'],
+          'poster_path': popularmoviesjson[i]['poster_path'],
+          'vote_average': popularmoviesjson[i]['vote_average'],
+          'Date': popularmoviesjson[i]['release_date'],
+          'id': popularmoviesjson[i]['id'],
         });
       }
     } else {
-      print(popularmoviesresponse.statusCode);
+      print(Childrenmoviesresponse.statusCode);
     }
-    /////////////////////////////////////////////
-    var nowplayingmoviesresponse =
-        await http.get(Uri.parse(nowplayingmoviesurl));
+
+    var nowplayingmoviesresponse = await http.get(Uri.parse(MoviesTonight));
     if (nowplayingmoviesresponse.statusCode == 200) {
       var tempdata = jsonDecode(nowplayingmoviesresponse.body);
       var nowplayingmoviesjson = tempdata['results'];
@@ -65,13 +52,13 @@ class _MovieState extends State<Movie> {
     } else {
       print(nowplayingmoviesresponse.statusCode);
     }
-    /////////////////////////////////////////////
-    var topratedmoviesresponse = await http.get(Uri.parse(topratedmoviesurl));
-    if (topratedmoviesresponse.statusCode == 200) {
-      var tempdata = jsonDecode(topratedmoviesresponse.body);
+
+    var grossmoviesresponse = await http.get(Uri.parse(HighestGross));
+    if (grossmoviesresponse.statusCode == 200) {
+      var tempdata = jsonDecode(grossmoviesresponse.body);
       var topratedmoviesjson = tempdata['results'];
       for (var i = 0; i < topratedmoviesjson.length; i++) {
-        topratedmovies.add({
+        grossmovies.add({
           "name": topratedmoviesjson[i]["title"],
           "poster_path": topratedmoviesjson[i]["poster_path"],
           "vote_average": topratedmoviesjson[i]["vote_average"],
@@ -80,33 +67,36 @@ class _MovieState extends State<Movie> {
         });
       }
     } else {
-      print(topratedmoviesresponse.statusCode);
+      print(grossmoviesresponse.statusCode);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    // moviesfunction();
+    moviesfunction();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: moviesfunction(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
-            return Center(
-                child: CircularProgressIndicator(color: Colors.amber.shade400));
-          else {
-            return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  sliderlist(popularmovies, "Children Movies", "movie", 20),
-                  sliderlist(nowplayingmovies, "Now Playing", "movie", 20),
-                  sliderlist(topratedmovies, "Top Rated", "movie", 20)
-                ]);
-          }
-        });
+      future: moviesfunction(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return Center(
+            child: CircularProgressIndicator(color: Colors.amber.shade400),
+          );
+        else {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              sliderlist(Childrenmovies, "Children Movies", "movie", 20),
+              sliderlist(nowplayingmovies, "Now Playing", "movie", 20),
+              sliderlist(grossmovies, "Highest Gross", "movie", 20),
+            ],
+          );
+        }
+      },
+    );
   }
 }

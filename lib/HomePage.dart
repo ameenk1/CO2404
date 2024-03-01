@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:g21097717/api.dart';
 import 'package:g21097717/SearchFunction.dart';
 import 'package:g21097717/tvseries.dart';
-import 'package:g21097717/Children.dart';
+import 'package:g21097717/watch.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -28,7 +28,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> trendinglisthome() async {
-    var TrendingTypeResponse = await http.get(Uri.parse(TrendingMovies));
+    var TrendingTypeResponse = await http.get(Uri.parse(bestmoviesurl));
 
     var tempData = jsonDecode(TrendingTypeResponse.body);
     var trendingweekjason = tempData['results'];
@@ -102,7 +102,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Trending Movies' + '🔥',
+                  'Best Movies' + '🔥',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
                     fontSize: 16,
@@ -126,7 +126,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     indicator: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         color: Colors.amber.withOpacity(0.4)),
-                    tabs: [
+                    tabs: [  //options in the menu bar text
                       Tab(child: Text('Tv Series')),
                       Tab(child: Text('Movies')),
                       Tab(child: Text('To Watch'))
@@ -136,10 +136,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 height: 1050,
                 child: TabBarView(
                   controller: _tabController,
-                  children: [
+                  children: [ //options in the menu bar functions to call on tap
                     TvSeries(), 
-                    Movie(), //change
-                    Children(),
+                    Movie(), 
+                    watchlist(),
                   ],
                 ),
               )
