@@ -165,13 +165,14 @@ class _SearchFunctionState extends State<SearchFunction> {
                                 child: Row(
                                   children: [
                                     Container(
+                                      width: 120,
+                                      height: 180,
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: NetworkImage(
                                             'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}',
-
                                           ),
-                                          fit: BoxFit.fill,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
@@ -277,4 +278,3 @@ class _SearchFunctionState extends State<SearchFunction> {
     );
   }
 }
-

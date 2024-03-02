@@ -21,26 +21,29 @@ class _MovieDetailsState extends State<MovieDetails> {
   List<Map<String, dynamic>> similarmovieslist = [];
   List<Map<String, dynamic>> recommendedmovieslist = [];
   List MoviesGenres = [];
+  List<Map<String, dynamic>> castmovieslist = [];
   List<Map<String, dynamic>> movieCast = [];
 
   Future Moviedetails() async {
-    var moviedetailurl = 'https://api.themoviedb.org/3/movie/' +
-        widget.id.toString() +
-        '?api_key=$apikey';
-    var UserReviewurl = 'https://api.themoviedb.org/3/movie/' +
-        widget.id.toString() +
-        '/reviews?api_key=$apikey';
-    var similarmoviesurl = 'https://api.themoviedb.org/3/movie/' +
-        widget.id.toString() +
-        '/similar?api_key=$apikey';
-    var recommendedmoviesurl = 'https://api.themoviedb.org/3/movie/' +
-        widget.id.toString() +
-        '/recommendations?api_key=$apikey';
-    var moviecreditsurl = 'https://api.themoviedb.org/3/movie/' +
-        widget.id.toString() +
-        '/credits?api_key=$apikey';
+    var MovieTrailersUrl =
+        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/videos?api_key=$apikey';
 
-    var moviedetailresponse = await http.get(Uri.parse(moviedetailurl));
+    var MovieDetailUrl =
+        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '?api_key=$apikey';
+
+    var UserReviewUrl =
+        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/reviews?api_key=$apikey';
+
+    var SimilarMoviesUrl =
+        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/similar?api_key=$apikey';
+
+    var RecommendedMoviesUrl =
+        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/recommendations?api_key=$apikey';
+
+    var MovieCreditsUrl =
+        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/credits?api_key=$apikey';
+
+    var moviedetailresponse = await http.get(Uri.parse(MovieDetailUrl));
     if (moviedetailresponse.statusCode == 200) {
       var moviedetailjson = jsonDecode(moviedetailresponse.body);
       for (var i = 0; i < 1; i++) {
@@ -58,35 +61,12 @@ class _MovieDetailsState extends State<MovieDetails> {
       for (var i = 0; i < moviedetailjson['genres'].length; i++) {
         MoviesGenres.add(moviedetailjson['genres'][i]['name']);
       }
-    } else {}
+    } else {
+      // Handle error
+    }
 
-    /////////////////////////////User Reviews///////////////////////////////
-    var UserReviewresponse = await http.get(Uri.parse(UserReviewurl));
-    if (UserReviewresponse.statusCode == 200) {
-      var UserReviewjson = jsonDecode(UserReviewresponse.body);
-      for (var i = 0; i < UserReviewjson['results'].length; i++) {
-        UserReviews.add({
-          "name": UserReviewjson['results'][i]['author'],
-          "review": UserReviewjson['results'][i]['content'],
-          "rating": UserReviewjson['results'][i]['author_details']['rating'] ==
-                  null
-              ? "Not Rated"
-              : UserReviewjson['results'][i]['author_details']['rating']
-                  .toString(),
-          "avatarphoto": UserReviewjson['results'][i]['author_details']
-                      ['avatar_path'] ==
-                  null
-              ? "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-              : "https://image.tmdb.org/t/p/w500" +
-                  UserReviewjson['results'][i]['author_details']['avatar_path'],
-          "creationdate":
-              UserReviewjson['results'][i]['created_at'].substring(0, 10),
-          "fullreviewurl": UserReviewjson['results'][i]['url'],
-        });
-      }
-    } else {}
-    /////////////////////////////similar movies
-    var similarmoviesresponse = await http.get(Uri.parse(similarmoviesurl));
+    //similar movies
+    var similarmoviesresponse = await http.get(Uri.parse(SimilarMoviesUrl));
     if (similarmoviesresponse.statusCode == 200) {
       var similarmoviesjson = jsonDecode(similarmoviesresponse.body);
       for (var i = 0; i < similarmoviesjson['results'].length; i++) {
@@ -98,10 +78,13 @@ class _MovieDetailsState extends State<MovieDetails> {
           "id": similarmoviesjson['results'][i]['id'],
         });
       }
-    } else {}
-    /////////////////////////////recommended movies
+    } else {
+      // Handle error
+    }
+    print(similarmovieslist);
+    //recommended movies
     var recommendedmoviesresponse =
-        await http.get(Uri.parse(recommendedmoviesurl));
+        await http.get(Uri.parse(RecommendedMoviesUrl));
     if (recommendedmoviesresponse.statusCode == 200) {
       var recommendedmoviesjson = jsonDecode(recommendedmoviesresponse.body);
       for (var i = 0; i < recommendedmoviesjson['results'].length; i++) {
@@ -113,108 +96,143 @@ class _MovieDetailsState extends State<MovieDetails> {
           "id": recommendedmoviesjson['results'][i]['id'],
         });
       }
-    } else {}
-    /////////////////////////////movie cast
-    var moviecreditsresponse = await http.get(Uri.parse(moviecreditsurl));
-    if (moviecreditsresponse.statusCode == 200) {
-      var moviecreditsjson = jsonDecode(moviecreditsresponse.body);
-      for (var i = 0; i < moviecreditsjson['cast'].length; i++) {
-        movieCast.add({
-          "name": moviecreditsjson['cast'][i]['name'],
-          "character": moviecreditsjson['cast'][i]['character'],
-          "profile_path": moviecreditsjson['cast'][i]['profile_path'] == null
-              ? "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-              : "https://image.tmdb.org/t/p/w500" +
-                  moviecreditsjson['cast'][i]['profile_path'],
+    } else {
+      // Handle error
+    }
+    var castmoviesresponse =
+        await http.get(Uri.parse(MovieCreditsUrl));
+    if (castmoviesresponse.statusCode == 200) {
+      var castmoviesjson = jsonDecode(castmoviesresponse.body);
+      for (var i = 0; i < castmoviesjson['results'].length; i++) {
+        castmovieslist.add({
+          "poster_path": castmoviesjson['results'][i]['poster_path'],
+          "name": castmoviesjson['results'][i]['title'],
         });
       }
-    } else {}
-
-    print(movieCast);
-  }
-
-  @override
-  void initState() {
-    super.initState();
+    } else {
+      // Handle error
+    }
+    
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(14, 14, 14, 1),
+      backgroundColor: const Color.fromRGBO(14, 14, 14, 1),
       body: FutureBuilder(
-          future: Moviedetails(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return CustomScrollView(
-                physics: BouncingScrollPhysics(),
-                slivers: [
-                  SliverAppBar(
-                    automaticallyImplyLeading: false,
-                    leading: IconButton(
+        future: Moviedetails(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  automaticallyImplyLeading: false,
+                  leading: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(FontAwesomeIcons.arrowLeft),
+                    iconSize: 28,
+                    color: Colors.white,
+                  ),
+                  actions: [
+                    IconButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ),
+                          (route) => false,
+                        );
                       },
-                      icon: Icon(Icons.arrow_back),
-                    ),
-                    actions: [
-                       IconButton(
-                              onPressed: () {
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => HomePage()),
-                                    (route) => false);
-                              },
-                              icon: Icon(FontAwesomeIcons.houseUser),
-                              iconSize: 25,
-                              color: Colors.white)
-                    ],
-                    backgroundColor: Color.fromRGBO(18, 18, 18, 0.5),
-                    centerTitle: false,
-                    pinned: true,
-                    expandedHeight: MediaQuery.of(context).size.height * 0.4,
-                    flexibleSpace: FlexibleSpaceBar(
-                      collapseMode: CollapseMode.parallax,
-                      background: FittedBox(
-                        fit: BoxFit.fill,
-                        child: Placeholder(), // replace with desired widget
-                      ),
+                      icon: Icon(FontAwesomeIcons.home),
+                      iconSize: 25,
+                      color: Colors.white,
+                    )
+                  ],
+                  backgroundColor: Color.fromRGBO(18, 18, 18, 0.5),
+                  centerTitle: false,
+                  pinned: true,
+                  expandedHeight: MediaQuery.of(context).size.height * 0.4,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: FittedBox(
+                      fit: BoxFit.fill,
+                      //child: trailerwatch(
+                      //   trailerytid: movietrailerslist[0]['key'],
+                      // ),
                     ),
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        // Add widgets for movie details, genres, reviews, etc.
-
-                        // Example:
-                        // MovieDetailWidget(),
-                        // GenresWidget(),
-                        // ReviewsWidget(),
-                        // SimilarMoviesWidget(),
-                        // RecommendedMoviesWidget(),
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    Column(
+                      children: [
+                        Row(children: [
+                          Container(
+                              padding: EdgeInsets.only(left: 10, top: 10),
+                              height: 50,
+                              width: MediaQuery.of(context).size.width,
+                              child: ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: MoviesGenres.length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    margin: EdgeInsets.only(right: 10),
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(25, 25, 25, 1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(MoviesGenres[index]),
+                                  );
+                                },
+                              )),
+                        ]),
+                        Row(
+                          children: [
+                            Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(25, 25, 25, 1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(MovieDetails[0]['runtime'].toString() + 'min'))
+                          ],
+                        )
                       ],
                     ),
-                  ),
-                ],
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                  color: Colors.amber,
-                ),
-              );
-            }
-          },
-        ),
-      );
-    }
+                    Padding(
+                        padding: EdgeInsets.only(left: 20, top: 10),
+                        child: Text('Movie Story: ')),
+                    Padding(
+                        padding: EdgeInsets.only(left: 20, top: 10),
+                        child: Text(MovieDetails[0]['overview'].toString())),
+                    Padding(
+                        padding: EdgeInsets.only(left: 20, top: 20),
+                        child: Text('Release Date' + MovieDetails[0]['release_date'].toString())),
+                    Padding(
+                        padding: EdgeInsets.only(left: 20, top: 20),
+                        child: Text('Budget: ' + MovieDetails[0]['budget'].toString())),
+                    Padding(
+                        padding: EdgeInsets.only(left: 20, top: 20),
+                        child: Text('Revenue: ' + MovieDetails[0]['revenue'].toString())),
+                    sliderlist(similarmovieslist, "Similar Movies", "movie", similarmovieslist.length),
+                    sliderlist(recommendedmovieslist, "Recommended Movies", "movie", recommendedmovieslist.length),
+                    sliderlist(castmovieslist, "Cast", "movie", castmovieslist.length),
+                  ]),
+                )
+              ],
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-
-
-                       
+}
