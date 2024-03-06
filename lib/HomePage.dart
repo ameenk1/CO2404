@@ -139,7 +139,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   children: [ //options in the menu bar functions to call on tap
                     TvSeries(), 
                     Movie(), 
-                    watchlist(),
+                    Watchlist(),
                   ],
                 ),
               )

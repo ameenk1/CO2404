@@ -1,7 +1,11 @@
 
 String apikey ='ba99f6ccb496e7c89f997871aff42499';
 
+String popularmoviesurl = 'https://api.themoviedb.org/3/movie/popular?api_key=$apikey';
+
 String TrendingMovies = 'https://api.themoviedb.org/3/movie/popular?api_key=$apikey';
+
+String UpComingMoviesurl = 'https://api.themoviedb.org/3/movie/upcoming?api_key=$apikey';
 
 String MoviesTonight = 'https://api.themoviedb.org/3/movie/now_playing?api_key=$apikey';
 

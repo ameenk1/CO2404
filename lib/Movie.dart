@@ -22,14 +22,14 @@ class _MovieState extends State<Movie> {
     var Childrenmoviesresponse = await http.get(Uri.parse(childrenurl));
     if (Childrenmoviesresponse.statusCode == 200) {
       var tempdata = jsonDecode(Childrenmoviesresponse.body);
-      var popularmoviesjson = tempdata['results'];
-      for (var i = 0; i < popularmoviesjson.length; i++) {
+      var childrenmoviesjson = tempdata['results'];
+      for (var i = 0; i < childrenmoviesjson.length; i++) {
         Childrenmovies.add({
-          'name': popularmoviesjson[i]['title'],
-          'poster_path': popularmoviesjson[i]['poster_path'],
-          'vote_average': popularmoviesjson[i]['vote_average'],
-          'Date': popularmoviesjson[i]['release_date'],
-          'id': popularmoviesjson[i]['id'],
+          'name': childrenmoviesjson[i]['title'],
+          'poster_path': childrenmoviesjson[i]['poster_path'],
+          'vote_average': childrenmoviesjson[i]['vote_average'],
+          'Date': childrenmoviesjson[i]['release_date'],
+          'id': childrenmoviesjson[i]['id'],
         });
       }
     } else {
