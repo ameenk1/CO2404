@@ -17,10 +17,19 @@ class _SearchFunctionState extends State<SearchFunction> {
   final TextEditingController searchText = TextEditingController();
   bool showResultsList = false;
   var val1;
+  String dropdownValue = 'Default';
+  
 
   Future<void> searchList(String value) async {
-    var searchLink =
-        'https://api.themoviedb.org/3/search/multi?api_key=$apikey&query=$value';
+    String searchLink;
+
+    if (dropdownValue == 'Actors') {
+      searchLink =
+          'https://api.themoviedb.org/3/search/person?api_key=$apikey&query=$value';
+    } else {
+      searchLink =
+          'https://api.themoviedb.org/3/search/multi?api_key=$apikey&query=$value';
+    }
 
     var searchResponse = await http.get(Uri.parse(searchLink));
 
@@ -31,16 +40,18 @@ class _SearchFunctionState extends State<SearchFunction> {
       searchResult.clear(); // Clear previous search results
       for (var obj in searchJson) {
         if (obj['id'] != null &&
-            obj['poster_path'] != null &&
+            (obj['poster_path'] != null || obj['profile_path'] != null) &&
             obj['vote_average'] != null &&
             obj['media_type'] != null) {
           searchResult.add({
             'id': obj['id'],
             'poster_path': obj['poster_path'],
+            'profile_path': obj['profile_path'],
             'vote_average': obj['vote_average'],
             'media_type': obj['media_type'], 
             'popularity': obj['popularity'],
-            'overview': obj['overview']
+            'overview': obj['overview'],
+            'name': obj['name'], // Add actor's name
           });
 
           if (searchResult.length > 20) {
@@ -60,7 +71,9 @@ class _SearchFunctionState extends State<SearchFunction> {
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        showResultsList = !showResultsList; //bool
+        setState(() {
+          showResultsList = !showResultsList;
+        });
       },
       child: SingleChildScrollView(
         child: Padding(
@@ -74,55 +87,66 @@ class _SearchFunctionState extends State<SearchFunction> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                child: TextField(
-                  autofocus: false,
-                  controller: searchText,
-                  onSubmitted: (value) {
-                    setState(() {
-                      val1 = value;
-                      searchList(val1);
-                    });
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      val1 = value;
-                      searchList(val1);
-                    });
-                  },
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        Fluttertoast.showToast(
-                          webBgColor: "#000000",
-                          webPosition: "center",
-                          webShowClose: true,
-                          msg: "Search Cleared",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 2,
-                          backgroundColor: Color.fromRGBO(18, 18, 18, 1),
-                          textColor: Colors.white,
-                          fontSize: 16.0,
-                        );
-                        setState(() {
-                          searchText.clear();
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          searchResult.clear();
-                        });
-                      },
-                      icon: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.amber.withOpacity(0.6),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<String>(
+                        value: dropdownValue,
+                        icon: const Icon(Icons.arrow_downward),
+                        iconSize: 20,
+                        elevation: 16,
+                        style: const TextStyle(color: Colors.amber),
+                        underline: Container(
+                          height: 0,
+                          color: Colors.amber,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            dropdownValue = newValue!;
+                          });
+                        },
+                        items: <String>[
+                          'Default',
+                          'Movies and TV Series',
+                          'Actors'
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.amber,
+                    Expanded(
+                      flex: 4,
+                      child: TextField(
+                        autofocus: false,
+                        controller: searchText,
+                        onSubmitted: (value) {
+                          setState(() {
+                            val1 = value;
+                            searchList(val1);
+                          });
+                        },
+                        onChanged: (value) {
+                          setState(() {
+                            val1 = value;
+                            searchList(val1);
+                          });
+                        },
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.amber,
+                          ),
+                          hintText: 'search here',
+                          hintStyle:
+                              TextStyle(color: Colors.white.withOpacity(0.2)),
+                          border: InputBorder.none,
+                        ),
+                      ),
                     ),
-                    hintText: 'search here',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
-                    border: InputBorder.none,
-                  ),
+                  ],
                 ),
               ),
               SizedBox(height: 5),
@@ -130,7 +154,8 @@ class _SearchFunctionState extends State<SearchFunction> {
                 FutureBuilder(
                   future: searchList(val1),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator(color: Colors.amber),
                       );
@@ -160,7 +185,8 @@ class _SearchFunctionState extends State<SearchFunction> {
                                 width: MediaQuery.of(context).size.width * 0.4,
                                 decoration: BoxDecoration(
                                   color: Color.fromRGBO(20, 20, 20, 1),
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
                                 child: Row(
                                   children: [
@@ -170,7 +196,9 @@ class _SearchFunctionState extends State<SearchFunction> {
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: NetworkImage(
-                                            'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}',
+                                            dropdownValue == 'Actors'
+                                                ? 'https://image.tmdb.org/t/p/w200/${searchResult[index]['profile_path']}'
+                                                : 'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}',
                                           ),
                                           fit: BoxFit.cover,
                                         ),
@@ -181,12 +209,15 @@ class _SearchFunctionState extends State<SearchFunction> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
                                               alignment: Alignment.topCenter,
                                               child: Text(
-                                                '${searchResult[index]['media_type']}',
+                                                dropdownValue == 'Actors'
+                                                    ? searchResult[index]['name']
+                                                    : '${searchResult[index]['media_type']}',
                                               ),
                                             ),
                                             Container(

@@ -8,8 +8,8 @@ import 'package:g21097717/detailscreens/slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MovieDetails extends StatefulWidget {
-  var id;
-  MovieDetails({this.id});
+  final int id;
+  MovieDetails({required this.id});
 
   @override
   State<MovieDetails> createState() => _MovieDetailsState();
@@ -17,22 +17,13 @@ class MovieDetails extends StatefulWidget {
 
 class _MovieDetailsState extends State<MovieDetails> {
   List<Map<String, dynamic>> MovieDetails = [];
-  List<Map<String, dynamic>> UserReviews = [];
   List<Map<String, dynamic>> similarmovieslist = [];
   List<Map<String, dynamic>> recommendedmovieslist = [];
   List MoviesGenres = [];
-  List<Map<String, dynamic>> castmovieslist = [];
-  List<Map<String, dynamic>> movieCast = [];
 
-  Future Moviedetails() async {
-    var MovieTrailersUrl =
-        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/videos?api_key=$apikey';
-
+  Future<void> Moviedetails() async {
     var MovieDetailUrl =
         'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '?api_key=$apikey';
-
-    var UserReviewUrl =
-        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/reviews?api_key=$apikey';
 
     var SimilarMoviesUrl =
         'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/similar?api_key=$apikey';
@@ -40,24 +31,19 @@ class _MovieDetailsState extends State<MovieDetails> {
     var RecommendedMoviesUrl =
         'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/recommendations?api_key=$apikey';
 
-    var MovieCreditsUrl =
-        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/credits?api_key=$apikey';
-
     var moviedetailresponse = await http.get(Uri.parse(MovieDetailUrl));
     if (moviedetailresponse.statusCode == 200) {
       var moviedetailjson = jsonDecode(moviedetailresponse.body);
-      for (var i = 0; i < 1; i++) {
-        MovieDetails.add({
-          "backdrop_path": moviedetailjson['backdrop_path'],
-          "title": moviedetailjson['title'],
-          "vote_average": moviedetailjson['vote_average'],
-          "overview": moviedetailjson['overview'],
-          "release_date": moviedetailjson['release_date'],
-          "runtime": moviedetailjson['runtime'],
-          "budget": moviedetailjson['budget'],
-          "revenue": moviedetailjson['revenue'],
-        });
-      }
+      MovieDetails.add({
+        "backdrop_path": moviedetailjson['backdrop_path'],
+        "title": moviedetailjson['title'],
+        "vote_average": moviedetailjson['vote_average'],
+        "overview": moviedetailjson['overview'],
+        "release_date": moviedetailjson['release_date'],
+        "runtime": moviedetailjson['runtime'],
+        "budget": moviedetailjson['budget'],
+        "revenue": moviedetailjson['revenue'],
+      });
       for (var i = 0; i < moviedetailjson['genres'].length; i++) {
         MoviesGenres.add(moviedetailjson['genres'][i]['name']);
       }
@@ -81,7 +67,7 @@ class _MovieDetailsState extends State<MovieDetails> {
     } else {
       // Handle error
     }
-    print(similarmovieslist);
+
     //recommended movies
     var recommendedmoviesresponse =
         await http.get(Uri.parse(RecommendedMoviesUrl));
@@ -99,20 +85,6 @@ class _MovieDetailsState extends State<MovieDetails> {
     } else {
       // Handle error
     }
-    var castmoviesresponse =
-        await http.get(Uri.parse(MovieCreditsUrl));
-    if (castmoviesresponse.statusCode == 200) {
-      var castmoviesjson = jsonDecode(castmoviesresponse.body);
-      for (var i = 0; i < castmoviesjson['results'].length; i++) {
-        castmovieslist.add({
-          "poster_path": castmoviesjson['results'][i]['poster_path'],
-          "name": castmoviesjson['results'][i]['title'],
-        });
-      }
-    } else {
-      // Handle error
-    }
-    
   }
 
   @override
@@ -157,12 +129,14 @@ class _MovieDetailsState extends State<MovieDetails> {
                   pinned: true,
                   expandedHeight: MediaQuery.of(context).size.height * 0.4,
                   flexibleSpace: FlexibleSpaceBar(
-                    background: FittedBox(
-                      fit: BoxFit.fill,
-                      //child: trailerwatch(
-                      //   trailerytid: movietrailerslist[0]['key'],
-                      // ),
-                    ),
+                    background: MovieDetails[0]['backdrop_path'] != null
+                        ? Image.network(
+                            'https://image.tmdb.org/t/p/w500/${MovieDetails[0]['backdrop_path']}',
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            color: Colors.grey, // Placeholder color if no backdrop path available
+                          ),
                   ),
                 ),
                 SliverList(
@@ -219,9 +193,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                     Padding(
                         padding: EdgeInsets.only(left: 20, top: 20),
                         child: Text('Revenue: ' + MovieDetails[0]['revenue'].toString())),
-                    sliderlist(similarmovieslist, "Similar Movies", "movie", similarmovieslist.length),
-                    sliderlist(recommendedmovieslist, "Recommended Movies", "movie", recommendedmovieslist.length),
-                    sliderlist(castmovieslist, "Cast", "movie", castmovieslist.length),
+                    // Add your sliderlist widgets here with similarmovieslist and recommendedmovieslist
                   ]),
                 )
               ],
