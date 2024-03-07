@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:g21097717/api.dart';
 
+
 class SearchFunction extends StatefulWidget {
   const SearchFunction({Key? key}) : super(key: key);
 
@@ -15,21 +16,11 @@ class SearchFunction extends StatefulWidget {
 class _SearchFunctionState extends State<SearchFunction> {
   List<Map<String, dynamic>> searchResult = [];
   final TextEditingController searchText = TextEditingController();
-  bool showResultsList = false;
   var val1;
-  String dropdownValue = 'Default';
-  
 
   Future<void> searchList(String value) async {
-    String searchLink;
-
-    if (dropdownValue == 'Actors') {
-      searchLink =
-          'https://api.themoviedb.org/3/search/person?api_key=$apikey&query=$value';
-    } else {
-      searchLink =
-          'https://api.themoviedb.org/3/search/multi?api_key=$apikey&query=$value';
-    }
+    var searchLink =
+        'https://api.themoviedb.org/3/search/multi?api_key=$apikey&query=$value';
 
     var searchResponse = await http.get(Uri.parse(searchLink));
 
@@ -39,19 +30,18 @@ class _SearchFunctionState extends State<SearchFunction> {
 
       searchResult.clear(); // Clear previous search results
       for (var obj in searchJson) {
-        if (obj['id'] != null &&
-            (obj['poster_path'] != null || obj['profile_path'] != null) &&
-            obj['vote_average'] != null &&
-            obj['media_type'] != null) {
+        if ((obj['id'] != null && obj['vote_average'] != null && obj['media_type'] != null) || 
+            (obj['id'] != null && obj['name'] != null && obj['profile_path'] != null)) {
           searchResult.add({
             'id': obj['id'],
+            'name': obj['title'] ?? obj['name'],
             'poster_path': obj['poster_path'],
             'profile_path': obj['profile_path'],
             'vote_average': obj['vote_average'],
-            'media_type': obj['media_type'], 
+            'media_type': obj['media_type'] ?? 'person',
             'popularity': obj['popularity'],
             'overview': obj['overview'],
-            'name': obj['name'], // Add actor's name
+            'known_for_department': obj['known_for_department'],
           });
 
           if (searchResult.length > 20) {
@@ -71,9 +61,6 @@ class _SearchFunctionState extends State<SearchFunction> {
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        setState(() {
-          showResultsList = !showResultsList;
-        });
       },
       child: SingleChildScrollView(
         child: Padding(
@@ -87,66 +74,49 @@ class _SearchFunctionState extends State<SearchFunction> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButton<String>(
-                        value: dropdownValue,
-                        icon: const Icon(Icons.arrow_downward),
-                        iconSize: 20,
-                        elevation: 16,
-                        style: const TextStyle(color: Colors.amber),
-                        underline: Container(
-                          height: 0,
-                          color: Colors.amber,
-                        ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValue = newValue!;
-                          });
-                        },
-                        items: <String>[
-                          'Default',
-                          'Movies and TV Series',
-                          'Actors'
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
+                child: TextField(
+                  autofocus: false,
+                  controller: searchText,
+                  onChanged: (value) {
+                    setState(() {
+                      val1 = value;
+                      searchList(val1);
+                    });
+                  },
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        Fluttertoast.showToast(
+                          webBgColor: "#000000",
+                          webPosition: "center",
+                          webShowClose: true,
+                          msg: "Search Cleared",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 2,
+                          backgroundColor: Color.fromRGBO(18, 18, 18, 1),
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                        setState(() {
+                          searchText.clear();
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          searchResult.clear();
+                        });
+                      },
+                      icon: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.amber.withOpacity(0.6),
                       ),
                     ),
-                    Expanded(
-                      flex: 4,
-                      child: TextField(
-                        autofocus: false,
-                        controller: searchText,
-                        onSubmitted: (value) {
-                          setState(() {
-                            val1 = value;
-                            searchList(val1);
-                          });
-                        },
-                        onChanged: (value) {
-                          setState(() {
-                            val1 = value;
-                            searchList(val1);
-                          });
-                        },
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: Colors.amber,
-                          ),
-                          hintText: 'search here',
-                          hintStyle:
-                              TextStyle(color: Colors.white.withOpacity(0.2)),
-                          border: InputBorder.none,
-                        ),
-                      ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.amber,
                     ),
-                  ],
+                    hintText: 'search here',
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
               SizedBox(height: 5),
@@ -154,8 +124,7 @@ class _SearchFunctionState extends State<SearchFunction> {
                 FutureBuilder(
                   future: searchList(val1),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator(color: Colors.amber),
                       );
@@ -169,7 +138,7 @@ class _SearchFunctionState extends State<SearchFunction> {
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onTap: () {
-                                  Navigator.push(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => descriptioncheckui(
@@ -185,8 +154,7 @@ class _SearchFunctionState extends State<SearchFunction> {
                                 width: MediaQuery.of(context).size.width * 0.4,
                                 decoration: BoxDecoration(
                                   color: Color.fromRGBO(20, 20, 20, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
                                 ),
                                 child: Row(
                                   children: [
@@ -196,9 +164,9 @@ class _SearchFunctionState extends State<SearchFunction> {
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: NetworkImage(
-                                            dropdownValue == 'Actors'
-                                                ? 'https://image.tmdb.org/t/p/w200/${searchResult[index]['profile_path']}'
-                                                : 'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}',
+                                            (searchResult[index]['media_type'] =='tv' || searchResult[index]['media_type'] =='movie' )
+                                            ? 'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}'
+                                            : 'https://image.tmdb.org/t/p/w200${searchResult[index]['profile_path']}',
                                           ),
                                           fit: BoxFit.cover,
                                         ),
@@ -209,15 +177,12 @@ class _SearchFunctionState extends State<SearchFunction> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
                                         child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
                                               alignment: Alignment.topCenter,
                                               child: Text(
-                                                dropdownValue == 'Actors'
-                                                    ? searchResult[index]['name']
-                                                    : '${searchResult[index]['media_type']}',
+                                                '${searchResult[index]['name']}',
                                               ),
                                             ),
                                             Container(
@@ -284,7 +249,7 @@ class _SearchFunctionState extends State<SearchFunction> {
                                               width: MediaQuery.of(context).size.width * 0.4,
                                               height: 85,
                                               child: Text(
-                                                ' ${searchResult[index]['overview']}',
+                                                'Department: ${searchResult[index]['known_for_department'] ?? ''}',
                                                 style: TextStyle(fontSize: 12, color: Colors.white),
                                               ),
                                             )

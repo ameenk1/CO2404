@@ -32,23 +32,23 @@ class _WatchlistState extends State<Watchlist> {
   }
 
   Future<void> _fetchMovies() async {
-    var upcomingMoviesResponse = await http.get(Uri.parse(popularmoviesurl));
-    if (upcomingMoviesResponse.statusCode == 200) {
-      var tempData = jsonDecode(upcomingMoviesResponse.body);
-      var upcomingMoviesJson = tempData['results'];
-      for (var i = 0; i < upcomingMoviesJson.length; i++) {
+    var cinemaMoviesResponse = await http.get(Uri.parse(popularmoviesurl));
+    if (cinemaMoviesResponse.statusCode == 200) {
+      var tempData = jsonDecode(cinemaMoviesResponse.body);
+      var cinemaMoviesJson = tempData['results'];
+      for (var i = 0; i < cinemaMoviesJson.length; i++) {
         upMovies.add({
-          'name': upcomingMoviesJson[i]['title'],
-          'poster_path': upcomingMoviesJson[i]['poster_path'],
-          'vote_average': upcomingMoviesJson[i]['vote_average'],
-          'Date': upcomingMoviesJson[i]['release_date'],
-          'id': upcomingMoviesJson[i]['id'],
+          'name': cinemaMoviesJson[i]['title'],
+          'poster_path': cinemaMoviesJson[i]['poster_path'],
+          'vote_average': cinemaMoviesJson[i]['vote_average'],
+          'Date': cinemaMoviesJson[i]['release_date'],
+          'id': cinemaMoviesJson[i]['id'],
         });
       }
       // Save movies to local storage
       _prefs.setString('upcomingMovies', jsonEncode(upMovies));
     } else {
-      print(upcomingMoviesResponse.statusCode);
+      print(cinemaMoviesResponse.statusCode);
     }
     setState(() {});
   }
@@ -66,7 +66,7 @@ class _WatchlistState extends State<Watchlist> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              sliderlist(upMovies, "Cinema Movies", "movie", 20),
+              sliderlist(upMovies, "On Cinema", "movie", 20),
             ],
           );
         }
