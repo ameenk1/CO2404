@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:g21097717/detailscreens/ActorDetails.dart';
 import 'package:g21097717/detailscreens/TvSeriesDetails.dart';
 import 'package:g21097717/detailscreens/MovieDetails.dart';
+import 'package:g21097717/detailscreens/ActorDetails.dart';
+
 
 class descriptioncheckui extends StatefulWidget {
   var newid;
@@ -20,7 +23,7 @@ class _descriptioncheckuiState extends State<descriptioncheckui> {
     } else if (widget.newtype.toString() == 'tv') {
       return TvSeriesDetails(id: widget.newid);
     } else if (widget.newtype.toString() == 'person') {
-      // return persondescriptionui(widget.id);
+       return ActorDetails(id: widget.newid);
     } else {
       return errorui(context);
     }

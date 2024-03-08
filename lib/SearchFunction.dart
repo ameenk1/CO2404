@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:g21097717/api.dart';
 
-
 class SearchFunction extends StatefulWidget {
   const SearchFunction({Key? key}) : super(key: key);
 
@@ -17,12 +16,16 @@ class _SearchFunctionState extends State<SearchFunction> {
   List<Map<String, dynamic>> searchResult = [];
   final TextEditingController searchText = TextEditingController();
   var val1;
+  String selectedOption = "Default"; // Default option selected
 
   Future<void> searchList(String value) async {
-    var searchLink =
-        'https://api.themoviedb.org/3/search/multi?api_key=$apikey&query=$value';
+    var searchLink = 'https://api.themoviedb.org/3/search/multi?api_key=$apikey&query=$value';
+    var searchLinkkids =
+        'https://api.themoviedb.org/3/search/multi?api_key=$apikey&query=$value&adult=false&with_genres=16';
 
-    var searchResponse = await http.get(Uri.parse(searchLink));
+    var currentSearchLink = selectedOption == "Default" ? searchLink : searchLinkkids;
+
+    var searchResponse = await http.get(Uri.parse(currentSearchLink));
 
     if (searchResponse.statusCode == 200) {
       var tempData = jsonDecode(searchResponse.body);
@@ -30,7 +33,7 @@ class _SearchFunctionState extends State<SearchFunction> {
 
       searchResult.clear(); // Clear previous search results
       for (var obj in searchJson) {
-        if ((obj['id'] != null && obj['vote_average'] != null && obj['media_type'] != null) || 
+        if ((obj['id'] != null && obj['vote_average'] != null && obj['media_type'] != null) ||
             (obj['id'] != null && obj['name'] != null && obj['profile_path'] != null)) {
           searchResult.add({
             'id': obj['id'],
@@ -69,54 +72,77 @@ class _SearchFunctionState extends State<SearchFunction> {
             children: [
               Container(
                 height: 50,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: TextField(
-                  autofocus: false,
-                  controller: searchText,
-                  onChanged: (value) {
-                    setState(() {
-                      val1 = value;
-                      searchList(val1);
-                    });
-                  },
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        Fluttertoast.showToast(
-                          webBgColor: "#000000",
-                          webPosition: "center",
-                          webShowClose: true,
-                          msg: "Search Cleared",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 2,
-                          backgroundColor: Color.fromRGBO(18, 18, 18, 1),
-                          textColor: Colors.white,
-                          fontSize: 16.0,
-                        );
+                child: Row(
+                  children: [
+                    DropdownButton<String>(
+                      value: selectedOption,
+                      onChanged: (String? newValue) {
                         setState(() {
-                          searchText.clear();
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          searchResult.clear();
+                          selectedOption = newValue!;
                         });
                       },
-                      icon: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.amber.withOpacity(0.6),
+                      items: <String>['Default', 'Children'].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        child: TextField(
+                          autofocus: false,
+                          controller: searchText,
+                          onChanged: (value) {
+                            setState(() {
+                              val1 = value;
+                              searchList(val1);
+                            });
+                          },
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                Fluttertoast.showToast(
+                                  webBgColor: "#000000",
+                                  webPosition: "center",
+                                  webShowClose: true,
+                                  msg: "Search Cleared",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 2,
+                                  backgroundColor: Color.fromRGBO(18, 18, 18, 1),
+                                  textColor: Colors.white,
+                                  fontSize: 16.0,
+                                );
+                                setState(() {
+                                  searchText.clear();
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  searchResult.clear();
+                                });
+                              },
+                              icon: Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                color: Colors.amber.withOpacity(0.6),
+                              ),
+                            ),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: Colors.amber,
+                            ),
+                            hintText: 'search here',
+                            hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                            border: InputBorder.none,
+                          ),
+                        ),
                       ),
                     ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.amber,
-                    ),
-                    hintText: 'search here',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
-                    border: InputBorder.none,
-                  ),
+                  ],
                 ),
               ),
               SizedBox(height: 5),
@@ -164,9 +190,10 @@ class _SearchFunctionState extends State<SearchFunction> {
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: NetworkImage(
-                                            (searchResult[index]['media_type'] =='tv' || searchResult[index]['media_type'] =='movie' )
-                                            ? 'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}'
-                                            : 'https://image.tmdb.org/t/p/w200${searchResult[index]['profile_path']}',
+                                            (searchResult[index]['media_type'] == 'tv' ||
+                                                    searchResult[index]['media_type'] == 'movie')
+                                                ? 'https://image.tmdb.org/t/p/w500${searchResult[index]['poster_path']}'
+                                                : 'https://image.tmdb.org/t/p/w200${searchResult[index]['profile_path']}',
                                           ),
                                           fit: BoxFit.cover,
                                         ),
@@ -245,14 +272,24 @@ class _SearchFunctionState extends State<SearchFunction> {
                                                 ],
                                               ),
                                             ),
-                                            Container(
-                                              width: MediaQuery.of(context).size.width * 0.4,
-                                              height: 85,
-                                              child: Text(
-                                                'Department: ${searchResult[index]['known_for_department'] ?? ''}',
-                                                style: TextStyle(fontSize: 12, color: Colors.white),
+                                            if (selectedOption == "Children")
+                                              Container(
+                                                width: MediaQuery.of(context).size.width * 0.4,
+                                                height: 85,
+                                                child: Text(
+                                                  'Type: ${searchResult[index]['media_type'] == 'tv' ? 'TV Series' : searchResult[index]['media_type'] == 'movie' ? 'Movie' : 'Actor'}',
+                                                  style: TextStyle(fontSize: 12, color: Colors.white),
+                                                ),
                                               ),
-                                            )
+                                            if (selectedOption == "Default")
+                                              Container(
+                                                width: MediaQuery.of(context).size.width * 0.4,
+                                                height: 85,
+                                                child: Text(
+                                                  'Type: ${searchResult[index]['media_type'] ?? ''}',
+                                                  style: TextStyle(fontSize: 12, color: Colors.white),
+                                                ),
+                                              ),
                                           ],
                                         ),
                                       ),

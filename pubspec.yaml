@@ -42,6 +42,8 @@ linter:
     - non_constant_identifier_names
 
 flutter:
+  assets:
+    - cinewhiz.png
 
   
   uses-material-design: true

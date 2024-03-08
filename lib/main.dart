@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:g21097717/HomePage.dart';
+import 'package:g21097717/firebase/auth_gate.dart';
 import 'package:flutter/services.dart'; 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart'; 
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget{
       ),
       debugShowCheckedModeBanner: false,
       title: 'Flutter Assignment CineWhiz',
-      home: HomePage(),
+      home: AuthGate(),
     );
   }
 }
