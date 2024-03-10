@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'package:g21097717/api.dart';
 import 'package:g21097717/detailscreens/slider.dart';
 
@@ -13,10 +12,8 @@ class Watchlist extends StatefulWidget {
 }
 
 class _WatchlistState extends State<Watchlist> {
-  List<Map<String, dynamic>> toWatchMovies = [];
   List<Map<String, dynamic>> upMovies = [];
-
-  late SharedPreferences _prefs;
+  List<Map<String, dynamic>> trendingMovies = [];
 
   @override
   void initState() {
@@ -25,6 +22,12 @@ class _WatchlistState extends State<Watchlist> {
   }
 
   Future<void> _fetchMovies() async {
+    await _fetchCinemaMovies();
+    await _fetchTrendingMovies();
+    setState(() {});
+  }
+
+  Future<void> _fetchCinemaMovies() async {
     var cinemaMoviesResponse = await http.get(Uri.parse(popularmoviesurl));
     if (cinemaMoviesResponse.statusCode == 200) {
       var tempData = jsonDecode(cinemaMoviesResponse.body);
@@ -39,9 +42,27 @@ class _WatchlistState extends State<Watchlist> {
         });
       }
     } else {
-      print(cinemaMoviesResponse.statusCode);
+      print("Loading");
     }
-    setState(() {});
+  }
+
+  Future<void> _fetchTrendingMovies() async {
+    var trendingMoviesResponse = await http.get(Uri.parse(UpComingMoviesurl));
+    if (trendingMoviesResponse.statusCode == 200) {
+      var tempData = jsonDecode(trendingMoviesResponse.body);
+      var trendingMoviesJson = tempData['results'];
+      for (var i = 0; i < trendingMoviesJson.length; i++) {
+        trendingMovies.add({
+          'name': trendingMoviesJson[i]['title'],
+          'poster_path': trendingMoviesJson[i]['poster_path'],
+          'vote_average': trendingMoviesJson[i]['vote_average'],
+          'Date': trendingMoviesJson[i]['release_date'],
+          'id': trendingMoviesJson[i]['id'],
+        });
+      }
+    } else {
+      print("Loading");
+    }
   }
 
   @override
@@ -49,7 +70,11 @@ class _WatchlistState extends State<Watchlist> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Slider for cinema movies
         sliderlist(upMovies, "On Cinema", "movie", 20),
+
+        // Slider for trending movies
+        sliderlist(trendingMovies, "Recommened Watch List", "movie", 20),
       ],
     );
   }

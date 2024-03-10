@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:g21097717/api.dart';
-import 'dart:convert';
-import 'package:g21097717/HomePage.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:g21097717/api.dart';
+import 'package:g21097717/HomePage.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:g21097717/detailscreens/slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -189,11 +189,16 @@ class _MovieDetailsState extends State<MovieDetails> {
                         child: Text('Release Date' + MovieDetails[0]['release_date'].toString())),
                     Padding(
                         padding: EdgeInsets.only(left: 20, top: 20),
-                        child: Text('Budget: ' + MovieDetails[0]['budget'].toString())),
+                        child: Text('Budget USD: ' + MovieDetails[0]['budget'].toString())),
                     Padding(
                         padding: EdgeInsets.only(left: 20, top: 20),
                         child: Text('Revenue: ' + MovieDetails[0]['revenue'].toString())),
-                    // Add your sliderlist widgets here with similarmovieslist and recommendedmovieslist
+
+                    // Slider for similar movies
+                    sliderlist(similarmovieslist, "Similar Movies", "movie", 20),
+
+                    // Slider for recommended movies
+                    sliderlist(recommendedmovieslist, "Recommended Movies", "movie", 20),
                   ]),
                 )
               ],

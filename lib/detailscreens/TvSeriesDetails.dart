@@ -134,12 +134,16 @@ class _TvSeriesDetailsState extends State<TvSeriesDetails> {
                             MediaQuery.of(context).size.height * 0.35,
                         pinned: true,
                         flexibleSpace: FlexibleSpaceBar(
-                          collapseMode: CollapseMode.parallax,
-                          background: FittedBox(
-                            fit: BoxFit.fill,
-                            
+                    background: TvSeriesDetails[0]['backdrop_path'] != null
+                        ? Image.network(
+                            'https://image.tmdb.org/t/p/w500/${TvSeriesDetails[0]['backdrop_path']}',
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            color: Colors.grey,
                           ),
-                        )),
+                  ),
+                  ),
                     SliverList(
                         delegate: SliverChildListDelegate([
                      

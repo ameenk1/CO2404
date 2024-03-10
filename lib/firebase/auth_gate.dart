@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:g21097717/HomePage.dart';
+import 'package:g21097717/main.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({Key? key});
@@ -15,7 +16,8 @@ class AuthGate extends StatelessWidget {
           // Show loading indicator while waiting for auth state
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData && snapshot.data != null) {
-          // User is logged in, set the boolean to true
+          // Set loggedIn to true before navigating to HomePage
+          loggedIn = true;
           return HomePage();
         } else {
           // User is not logged in, show sign-in screen
