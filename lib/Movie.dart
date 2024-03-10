@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:g21097717/api.dart';
-import 'package:g21097717/DetailScreen.dart';
+import 'package:g21097717/detailScreens/MovieDetails.dart';
 import 'package:g21097717/detailscreens/slider.dart';
 import 'package:url_launcher/url_launcher.dart';
 

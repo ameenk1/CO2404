@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:g21097717/Movie.dart';
-import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:g21097717/api.dart';
+import 'package:g21097717/HomePage.dart';
+import 'package:g21097717/Movie.dart';
 import 'package:g21097717/SearchFunction.dart';
 import 'package:g21097717/tvseries.dart';
 import 'package:g21097717/watch.dart';
@@ -46,6 +47,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('CineWhiz'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Perform sign-out operation
+              FirebaseAuth.instance.signOut();
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -119,26 +132,27 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 height: 45,
                 width: MediaQuery.of(context).size.width,
                 child: TabBar(
-                    physics: BouncingScrollPhysics(),
-                    labelPadding: EdgeInsets.symmetric(horizontal: 25),
-                    isScrollable: true,
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: Colors.amber.withOpacity(0.4)),
-                    tabs: [  //options in the menu bar text
-                      Tab(child: Text('Tv Series')),
-                      Tab(child: Text('Movies')),
-                      Tab(child: Text('To Watch'))
-                    ]),
+                  physics: BouncingScrollPhysics(),
+                  labelPadding: EdgeInsets.symmetric(horizontal: 25),
+                  isScrollable: true,
+                  controller: _tabController,
+                  indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: Colors.amber.withOpacity(0.4)),
+                  tabs: [
+                    Tab(child: Text('Tv Series')),
+                    Tab(child: Text('Movies')),
+                    Tab(child: Text('To Watch')),
+                  ],
+                ),
               ),
               Container(
                 height: 1050,
                 child: TabBarView(
                   controller: _tabController,
-                  children: [ //options in the menu bar functions to call on tap
-                    TvSeries(), 
-                    Movie(), 
+                  children: [
+                    TvSeries(),
+                    Movie(),
                     Watchlist(),
                   ],
                 ),
