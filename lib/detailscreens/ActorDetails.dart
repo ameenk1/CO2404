@@ -16,6 +16,7 @@ class _ActorDetailsState extends State<ActorDetails> {
   List<Map<String, dynamic>> actorDetails = [];
   List<Map<String, dynamic>> actorMoviesList = [];
   List actorGenres = [];
+  bool sortByAscending = true;
 
   Future<void> fetchActorDetails() async {
     var actorDetailsUrl = 'https://api.themoviedb.org/3/person/${widget.id}?api_key=$apikey';
@@ -41,6 +42,8 @@ class _ActorDetailsState extends State<ActorDetails> {
           actorMoviesList.add({
             "title": movie['title'],
             "character": movie['character'],
+            "release_date": movie['release_date'],
+            "poster_path": movie['poster_path'], // New field for storing poster path
             // Add more details as required
           });
         }
@@ -50,6 +53,19 @@ class _ActorDetailsState extends State<ActorDetails> {
     } else {
       // Handle error
     }
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortByAscending = !sortByAscending;
+      actorMoviesList.sort((a, b) {
+        if (sortByAscending) {
+          return a['release_date'].compareTo(b['release_date']);
+        } else {
+          return b['release_date'].compareTo(a['release_date']);
+        }
+      });
+    });
   }
 
   @override
@@ -120,9 +136,19 @@ class _ActorDetailsState extends State<ActorDetails> {
                             style: TextStyle(color: Colors.white),
                           ),
                           SizedBox(height: 20),
-                          Text(
-                            'Movies:',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Movies:',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                              IconButton(
+                                onPressed: toggleSortOrder,
+                                icon: Icon(sortByAscending ? Icons.arrow_upward : Icons.arrow_downward),
+                                color: Colors.white,
+                              ),
+                            ],
                           ),
                           SizedBox(height: 10),
                           Column(
@@ -131,14 +157,37 @@ class _ActorDetailsState extends State<ActorDetails> {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Title: ${movie['title']}',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    'Character: ${movie['character']}',
-                                    style: TextStyle(color: Colors.white),
+                                  Row(
+                                    children: [
+                                      if (movie['poster_path'] != null)
+                                        Image.network(
+                                          'https://image.tmdb.org/t/p/w200/${movie['poster_path']}',
+                                          width: 100,
+                                          height: 150,
+                                          fit: BoxFit.cover,
+                                        )
+                                      else
+                                        Container(
+                                          width: 100,
+                                          height: 150,
+                                          color: Colors.grey, // Placeholder color if no poster available
+                                        ),
+                                      SizedBox(width: 10),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Title: ${movie['title']}',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            'Character: ${movie['character']}',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                   SizedBox(height: 10),
                                 ],

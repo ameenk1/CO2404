@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart'; //Temporary message for search clear text
+
 import 'package:g21097717/checker.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -108,18 +108,6 @@ class _SearchFunctionState extends State<SearchFunction> {
                           decoration: InputDecoration(
                             suffixIcon: IconButton(
                               onPressed: () {
-                                Fluttertoast.showToast(
-                                  webBgColor: "#000000",
-                                  webPosition: "center",
-                                  webShowClose: true,
-                                  msg: "Search Cleared",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 2,
-                                  backgroundColor: Color.fromRGBO(18, 18, 18, 1),
-                                  textColor: Colors.white,
-                                  fontSize: 16.0,
-                                );
                                 setState(() {
                                   searchText.clear();
                                   FocusManager.instance.primaryFocus?.unfocus();

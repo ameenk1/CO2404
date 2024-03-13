@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:g21097717/firebase/firebase_store.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:g21097717/api.dart';
@@ -18,7 +20,6 @@ class MovieDetails extends StatefulWidget {
 class _MovieDetailsState extends State<MovieDetails> {
   List<Map<String, dynamic>> MovieDetails = [];
   List<Map<String, dynamic>> similarmovieslist = [];
-  List<Map<String, dynamic>> recommendedmovieslist = [];
   List MoviesGenres = [];
 
   Future<void> Moviedetails() async {
@@ -28,62 +29,57 @@ class _MovieDetailsState extends State<MovieDetails> {
     var SimilarMoviesUrl =
         'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/similar?api_key=$apikey';
 
-    var RecommendedMoviesUrl =
-        'https://api.themoviedb.org/3/movie/' + widget.id.toString() + '/recommendations?api_key=$apikey';
-
-    var moviedetailresponse = await http.get(Uri.parse(MovieDetailUrl));
-    if (moviedetailresponse.statusCode == 200) {
-      var moviedetailjson = jsonDecode(moviedetailresponse.body);
-      MovieDetails.add({
-        "backdrop_path": moviedetailjson['backdrop_path'],
-        "title": moviedetailjson['title'],
-        "vote_average": moviedetailjson['vote_average'],
-        "overview": moviedetailjson['overview'],
-        "release_date": moviedetailjson['release_date'],
-        "runtime": moviedetailjson['runtime'],
-        "budget": moviedetailjson['budget'],
-        "revenue": moviedetailjson['revenue'],
-      });
-      for (var i = 0; i < moviedetailjson['genres'].length; i++) {
-        MoviesGenres.add(moviedetailjson['genres'][i]['name']);
+    try {
+      var moviedetailresponse = await http.get(Uri.parse(MovieDetailUrl));
+      if (moviedetailresponse.statusCode == 200) {
+        var moviedetailjson = jsonDecode(moviedetailresponse.body);
+        MovieDetails.add({
+          "id": moviedetailjson['id'],
+          "backdrop_path": moviedetailjson['backdrop_path'],
+          "title": moviedetailjson['title'],
+          "vote_average": moviedetailjson['vote_average'],
+          "overview": moviedetailjson['overview'],
+          "release_date": moviedetailjson['release_date'],
+          "runtime": moviedetailjson['runtime'],
+          "budget": moviedetailjson['budget'],
+          "revenue": moviedetailjson['revenue'],
+        });
+        for (var i = 0; i < moviedetailjson['genres'].length; i++) {
+          MoviesGenres.add(moviedetailjson['genres'][i]['name']);
+        }
+      } else {
+        // Handle error
+        print('Error fetching movie details: ${moviedetailresponse.statusCode}');
+        print('Connection issue or server error');
       }
-    } else {
+    } catch (error) {
       // Handle error
+      print('Error fetching movie details: $error');
+      print('Connection issue or server error');
     }
 
-    //similar movies
-    var similarmoviesresponse = await http.get(Uri.parse(SimilarMoviesUrl));
-    if (similarmoviesresponse.statusCode == 200) {
-      var similarmoviesjson = jsonDecode(similarmoviesresponse.body);
-      for (var i = 0; i < similarmoviesjson['results'].length; i++) {
-        similarmovieslist.add({
-          "poster_path": similarmoviesjson['results'][i]['poster_path'],
-          "name": similarmoviesjson['results'][i]['title'],
-          "vote_average": similarmoviesjson['results'][i]['vote_average'],
-          "Date": similarmoviesjson['results'][i]['release_date'],
-          "id": similarmoviesjson['results'][i]['id'],
-        });
+    try {
+      var similarmoviesresponse = await http.get(Uri.parse(SimilarMoviesUrl));
+      if (similarmoviesresponse.statusCode == 200) {
+        var similarmoviesjson = jsonDecode(similarmoviesresponse.body);
+        for (var i = 0; i < similarmoviesjson['results'].length; i++) {
+          similarmovieslist.add({
+            "poster_path": similarmoviesjson['results'][i]['poster_path'],
+            "name": similarmoviesjson['results'][i]['title'],
+            "vote_average": similarmoviesjson['results'][i]['vote_average'],
+            "Date": similarmoviesjson['results'][i]['release_date'],
+            "id": similarmoviesjson['results'][i]['id'],
+          });
+        }
+      } else {
+        // Handle error
+        print('Error fetching similar movies: ${similarmoviesresponse.statusCode}');
+        print('Connection issue or server error');
       }
-    } else {
+    } catch (error) {
       // Handle error
-    }
-
-    //recommended movies
-    var recommendedmoviesresponse =
-        await http.get(Uri.parse(RecommendedMoviesUrl));
-    if (recommendedmoviesresponse.statusCode == 200) {
-      var recommendedmoviesjson = jsonDecode(recommendedmoviesresponse.body);
-      for (var i = 0; i < recommendedmoviesjson['results'].length; i++) {
-        recommendedmovieslist.add({
-          "poster_path": recommendedmoviesjson['results'][i]['poster_path'],
-          "name": recommendedmoviesjson['results'][i]['title'],
-          "vote_average": recommendedmoviesjson['results'][i]['vote_average'],
-          "Date": recommendedmoviesjson['results'][i]['release_date'],
-          "id": recommendedmoviesjson['results'][i]['id'],
-        });
-      }
-    } else {
-      // Handle error
+      print('Error fetching similar movies: $error');
+      print('Connection issue or server error');
     }
   }
 
@@ -122,7 +118,17 @@ class _MovieDetailsState extends State<MovieDetails> {
                       icon: Icon(FontAwesomeIcons.home),
                       iconSize: 25,
                       color: Colors.white,
-                    )
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+                        print(userId);
+                        saveMovieDetails(userId, MovieDetails[0]['id'], 'watched');
+                      },
+                      icon: Icon(Icons.visibility),
+                      iconSize: 25,
+                      color: Colors.white,
+                    ),
                   ],
                   backgroundColor: Color.fromRGBO(18, 18, 18, 0.5),
                   centerTitle: false,
@@ -196,9 +202,6 @@ class _MovieDetailsState extends State<MovieDetails> {
 
                     // Slider for similar movies
                     sliderlist(similarmovieslist, "Similar Movies", "movie", 20),
-
-                    // Slider for recommended movies
-                    sliderlist(recommendedmovieslist, "Recommended Movies", "movie", 20),
                   ]),
                 )
               ],

@@ -8,6 +8,7 @@ import 'package:g21097717/HomePage.dart';
 import 'package:g21097717/Movie.dart';
 import 'package:g21097717/SearchFunction.dart';
 import 'package:g21097717/tvseries.dart';
+import 'package:g21097717/watchlist.dart';
 import 'package:g21097717/watch.dart';
 
 class HomePage extends StatefulWidget {
@@ -48,14 +49,30 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('CineWhiz'),
+        centerTitle: true,
+        title: Text(
+          'CineWhiz',
+          textAlign: TextAlign.center,
+        ),
+        leading: IconButton(
+          onPressed: () {
+            // Navigate to WatchedScreen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => WatchedScreen(),
+              ),
+            );
+          },
+          icon: Icon(Icons.playlist_add),
+        ),
         actions: [
           IconButton(
             onPressed: () {
-              // Perform sign-out operation
+              // Sign out user
               FirebaseAuth.instance.signOut();
             },
-            icon: Icon(Icons.logout),
+            icon: Icon(Icons.exit_to_app),
           ),
         ],
       ),

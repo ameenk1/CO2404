@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:g21097717/detailscreens/ActorDetails.dart';
 import 'package:g21097717/detailscreens/TvSeriesDetails.dart';
 import 'package:g21097717/detailscreens/MovieDetails.dart';
-import 'package:g21097717/detailscreens/ActorDetails.dart';
+
 
 
 class descriptioncheckui extends StatefulWidget {
