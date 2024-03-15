@@ -3,8 +3,6 @@ import 'package:g21097717/detailscreens/ActorDetails.dart';
 import 'package:g21097717/detailscreens/TvSeriesDetails.dart';
 import 'package:g21097717/detailscreens/MovieDetails.dart';
 
-
-
 class descriptioncheckui extends StatefulWidget {
   var newid;
   var newtype;

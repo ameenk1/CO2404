@@ -1,0 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:g21097717/HomePage.dart'; // Adjust the import path as needed
+
+void main() {
+  testWidgets('Watchlist screen navigation test', (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(home: HomePage()));
+    // Tap the watchlist icon and rebuild the widget to reflect the change
+    await tester.tap(find.byIcon(Icons.playlist_add));
+    await tester.pumpAndSettle(); // Wait for the navigation animation to complete
+
+    // Check if the Watchlist screen is now visible
+    // This assumes you have a specific widget on your Watchlist screen that you can test for, like a AppBar title
+    expect(find.text('Your Watchlist'), findsOneWidget);
+  });
+}
